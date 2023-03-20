@@ -2,7 +2,8 @@ import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 cap = cv.VideoCapture('movingball.mp4')
-kernel = np.ones((5,5),np.uint8)
+kernelop = np.ones((5,5),np.uint8)
+kernelcl = np.ones((15,15),np.uint16)
 while(1):
     # Take each frame
     _, frame = cap.read()
@@ -30,21 +31,17 @@ while(1):
 
     # Bitwise-AND mask and original image
     mask = cv.bitwise_and(frame,frame, mask= full_mask)
-    opening = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel)
-    dilation = cv.dilate(opening,kernel,iterations = 1)
-    opAndClos = cv.morphologyEx(dilation, cv.MORPH_CLOSE, kernel)
+    opening = cv.morphologyEx(mask, cv.MORPH_OPEN, kernelop)
+    #dilation = cv.dilate(opening,kernelop,iterations = 1)
+    opAndClos = cv.morphologyEx(opening, cv.MORPH_CLOSE, kernelcl)
 
     edges = cv.Canny(opAndClos,100,200)
-    edges = cv.dilate(edges,kernel,iterations = 1)
-    edges = cv.morphologyEx(edges, cv.MORPH_CLOSE, kernel)
+    edges = cv.dilate(edges,kernelop,iterations = 1)
+    edges = cv.morphologyEx(edges, cv.MORPH_CLOSE, kernelop)
 
-    gray_img = cv.cvtColor(opAndClos, cv.COLOR_BGR2GRAY)
-
-    # convert the grayscale image to binary image
-    ret,thresh = cv.threshold(gray_img,127,255,0)
  
     # calculate moments of binary image
-    M = cv.moments(thresh)
+    M = cv.moments(edges)
  
     # calculate x,y coordinate of center
     cX = int(M["m10"] / M["m00"])
@@ -52,7 +49,7 @@ while(1):
  
     # put text and highlight the center
     cv.circle(frame, (cX, cY), 5, (255, 100, 100), -1)
-    cv.putText(frame, "centroid", (cX - 25, cY - 25),cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 100, 100), 2)
+    #cv.putText(frame, "center of mass", (cX - 25, cY - 25),cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 100, 100), 2)
     
     # display the image
     cv.imshow('edge',edges)
