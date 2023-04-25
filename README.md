@@ -1,5 +1,6 @@
-## WMA
-# WMA - PJATK
+# WMA
+## WMA - PJATK
+### Machine Vision (wizja maszynowa)
 * Zaj1 and Zaj2 - test
 * Project 1 - Color object tracking (red ball) - Morphological operations
 * Project 2 - Count the coins on the tray - Hough transform
